@@ -1,7 +1,9 @@
+require_relative 'cell.rb'
+
 class Game_World
   attr_accessor :columns, :rows, :cells_grid, :cells
 
-  def initialize(columns = 3, rows = 3)
+  def initialize(rows = 3, columns = 3)
     @columns = columns
     @rows = rows
     @cells = []
@@ -33,7 +35,7 @@ class Game_World
 
     # Neighbour to the Up-Right
     if cell_to_analyze.y > 0 and cell_to_analyze.x < (columns - 1)
-      cell_to_checking = cells_grid[cell_to_analyze.y -1][cell_to_analyze.x]
+      cell_to_checking = self.cells_grid[cell_to_analyze.y - 1][cell_to_analyze.x]
       live_neighbours << cell_to_checking if cell_to_checking.alive?
     end
     # Neighbour to the Down-Right
@@ -72,6 +74,12 @@ class Game_World
       live_neighbours << cell_to_checking if cell_to_checking.alive?
     end
     live_neighbours
+  end
+
+  def random_seed
+    cells.each do |cell|
+      cell.alive = [true, false].sample
+    end
   end
 
 end
