@@ -5,14 +5,14 @@ class Visual_Grid < Gosu::Window
 
   def initialize(height=1000, width=1000)
 
-    @height = height
-    @width = width
     super height, width, false
     self.caption = "Game of Life test Ernesto Insua"
     @generation = 0
+    #colors
     @background = Gosu::Color.new(0xffdedede)
     @alive = Gosu::Color.new(0xff121212)
     @dead = Gosu::Color.new(0xffededed)
+
     @rows = width/10
     @columns = height/10
     @world = Game_World.new(@rows, @columns)
@@ -32,17 +32,13 @@ class Visual_Grid < Gosu::Window
   def draw
     draw_background
     @game_of_life.game_world.cells.each do |cell|
-      if cell.alive?
-        draw_quad(cell.x * @column_width, cell.y * @row_height, @alive,
-                  cell.x * @column_width + (@column_width - 1), cell.y * @row_height, @alive,
-                  cell.x * @column_width + (@column_width - 1), cell.y * @row_height + (@row_height - 1), @alive,
-                  cell.x * @column_width, cell.y * @row_height + (@row_height - 1), @alive)
-      else
-        draw_quad(cell.x * @column_width, cell.y * @row_height, @dead,
-                  cell.x * @column_width + (@column_width - 1), cell.y * @row_height, @dead,
-                  cell.x * @column_width + (@column_width - 1), cell.y * @row_height + (@row_height - 1), @dead,
-                  cell.x * @column_width, cell.y * @row_height + (@row_height - 1), @dead)
-      end
+      cell_alive = cell.alive
+      cell_x = cell.x
+      cell_y = cell.y
+      draw_quad(cell_x * @column_width, cell_y* @row_height, cell_alive ? @alive : @dead,
+                cell_x * @column_width + (@column_width - 1), cell_y * @row_height, cell_alive ? @alive : @dead,
+                cell_x * @column_width + (@column_width - 1), cell_y * @row_height + (@row_height - 1), cell_alive ? @alive : @dead,
+                cell_x * @column_width, cell_y * @row_height + (@row_height - 1), cell_alive ? @alive : @dead)
     end
   end
 

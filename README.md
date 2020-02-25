@@ -7,3 +7,4 @@ Steps:
 1.Download RailsInstaller 3.4 from url http://railsinstaller.org/en and install it
 2.Execute gem install rspec
 3.Execute gem install gosu
+4.Execute gem install rubycritic

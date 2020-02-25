@@ -1,5 +1,5 @@
 require_relative 'cell.rb'
-
+# The Game_World class is used for the representation of the World in the game
 class Game_World
   attr_accessor :columns, :rows, :cells_grid, :cells
 

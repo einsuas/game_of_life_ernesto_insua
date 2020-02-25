@@ -1,5 +1,5 @@
 #Main file of the game
-
+# The Game_of_life class is the main class of the game
 class Game_of_life
 
   attr_accessor :game_world

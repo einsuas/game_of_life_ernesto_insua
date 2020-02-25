@@ -1,3 +1,4 @@
+# The Cell class is used for the representation of the Cells in the game
 class Cell
   attr_accessor :x, :y, :alive
 
