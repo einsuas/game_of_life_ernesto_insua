@@ -32,6 +32,12 @@ describe 'Game of life Ernesto' do
       expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(true)
       expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
     end
+
+    it 'Check counts cells' do
+      game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1]])
+      expect(game_world.live_cells.count).to eq(3)
+      expect(game_world.dead_cells.count).to eq(6)
+    end
   end
 
   context 'Game_World' do
@@ -67,8 +73,8 @@ describe 'Game of life Ernesto' do
       #Test that the inner elements are an array too
       subject.cells_grid.each do |row|
         expect(row.is_a?(Array)).to eq(true)
-        row.each do |element|
-          expect(element.is_a?(Cell)).to eq(true)
+        row.each do |cell|
+          expect(cell.is_a?(Cell)).to eq(true)
         end
       end
     end
@@ -137,25 +143,72 @@ describe 'Game of life Ernesto' do
 
     context '#1: Any living cell with fewer than two live neighbours dies, as if caused by underpopulation.' do
       it 'Kills live cell with 0 neighbour' do
-          expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_alive)
+          expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
         # ! in ruby changes the object permanently
           game_of_life.next_generation!
-          expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_dead)
+          expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(false)
       end
 
       it 'Kills live cell with 1 live neighbour' do
         game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1]])
         game_of_life.next_generation!
-        expect(game_of_life.game_world.cells_grid[0][1]).to eq(be_dead)
-        expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_dead)
+        expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(false)
+        expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(false)
       end
 
       it 'Dont kill live cell with 2 neighbours' do
         game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1]])
         game_of_life.next_generation!
-        expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_alive)
+        expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
       end
     end
+
+    context '#2: Any live cell with more than three live neighbours dies, as if by overcrowding.' do
+      it 'Should kill live cell with more than 3 live neighbours' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1], [2, 2], [1, 2]])
+        expect(game_of_life.game_world.live_neighbours_of_the_cell(game_of_life.game_world.cells_grid[1][1]).count).to eq(4)
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(false)
+        expect(game_of_life.game_world.cells_grid[2][1].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[2][2].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[1][2].alive).to eq(false)
+      end
+    end
+
+    context '#3: Any live cell with two or three live neighbours lives on to the next generation.' do
+      it 'Should keep alive cell with 2 neighbours to next generation' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1]])
+        expect(game_of_life.game_world.live_neighbours_of_the_cell(game_of_life.game_world.cells_grid[1][1]).count).to eq(2)
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(false)
+        expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[2][1].alive).to eq(false)
+      end
+
+      it 'Should keep alive cell with 3 neighbours to next generation' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1], [2, 2]])
+        expect(game_of_life.game_world.live_neighbours_of_the_cell(game_of_life.game_world.cells_grid[1][1]).count).to eq(3)
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(false)
+        expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[2][1].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[2][2].alive).to eq(true)
+      end
+    end
+
+
+
+    context '#4: Any dead cell with exactly three live neighbours becomes a live cell.' do
+      it 'Revives dead cell with 3 neighbours' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1]])
+        expect(game_of_life.game_world.live_neighbours_of_the_cell(game_of_life.game_world.cells_grid[1][0]).count).to eq(3)
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[1][0].alive).to eq(true)
+        expect(game_of_life.game_world.cells_grid[1][2].alive).to eq(true)
+      end
+    end
+
 
 
   end
