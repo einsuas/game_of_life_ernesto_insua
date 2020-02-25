@@ -5,6 +5,11 @@ require_relative 'game_of_life_ernesto_insua.rb'
 
 describe 'Game of life Ernesto' do
 
+  #Global variables
+  let!(:game_world) { Game_World.new }
+  let!(:game_of_life) { Game_of_life.new(game_world, [[1, 1]]) }
+  let!(:cell) { Cell.new(1,1)}
+
   context 'Game_of_life' do
 
     subject { Game_of_life.new }
@@ -21,6 +26,12 @@ describe 'Game of life Ernesto' do
       expect(subject.game_world.is_a?(Game_World)).to eq(true)
       expect(subject.initials_cells.is_a?(Array)).to eq(true)
     end
+
+    it 'Check initials_cells initialization' do
+      game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1]])
+      expect(game_of_life.game_world.cells_grid[0][1].alive).to eq(true)
+      expect(game_of_life.game_world.cells_grid[1][1].alive).to eq(true)
+    end
   end
 
   context 'Game_World' do
@@ -34,6 +45,20 @@ describe 'Game of life Ernesto' do
       expect(subject).to respond_to(:columns)
       expect(subject).to respond_to(:rows)
       expect(subject).to respond_to(:cells_grid)
+      expect(subject).to respond_to(:cells)
+      expect(subject).to respond_to(:live_neighbours_of_the_cell)
+    end
+
+    it 'Populate cells array' do
+      #3x3
+      expect(subject.cells.count).to eq(9)
+      #Test that the inner elements are an array too
+      subject.cells_grid.each do |row|
+        expect(row.is_a?(Array)).to eq(true)
+        row.each do |element|
+          expect(element.is_a?(Cell)).to eq(true)
+        end
+      end
     end
 
     it 'Responds to created cells_grid array' do
@@ -47,6 +72,41 @@ describe 'Game of life Ernesto' do
         end
       end
     end
+
+    it 'Detects live neighbour Up' do
+      subject.cells_grid[cell.y - 1][cell.x].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(0)
+    end
+    it 'Detects live neighbour Right' do
+      subject.cells_grid[cell.y][cell.x + 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(0)
+    end
+    it 'Detects live neighbour Down' do
+      subject.cells_grid[cell.y + 1][cell.x].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+    it 'Detects live neighbour Left' do
+      subject.cells_grid[cell.y][cell.x - 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+    it 'Detects live neighbour Up-Right' do
+      subject.cells_grid[cell.y - 1][cell.x + 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+    it 'Detects live neighbour Down-Right' do
+      subject.cells_grid[cell.y + 1][cell.x + 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+
+    it 'Detects live neighbour Down-Left' do
+      subject.cells_grid[cell.y + 1][cell.x - 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+    it 'Detects live neighbour Up-Left' do
+      subject.cells_grid[cell.y - 1][cell.x - 1].alive = true
+      expect(subject.live_neighbours_of_the_cell(cell).count).to eq(1)
+    end
+
   end
 
   context 'Cell' do
@@ -59,7 +119,8 @@ describe 'Game of life Ernesto' do
     it 'Check if all properties and method exists' do
       expect(subject).to respond_to(:x)
       expect(subject).to respond_to(:y)
-      expect(subject).to respond_to(:alive)
+      expect(subject).to respond_to(:alive?)
+      expect(subject).to respond_to(:die!)
     end
 
     it 'Check initialization' do
@@ -70,6 +131,34 @@ describe 'Game of life Ernesto' do
 
   end
 
+
+
+  context 'Game_Rules' do
+
+    context '#1: Any living cell with fewer than two live neighbours dies, as if caused by underpopulation.' do
+      it 'Kills live cell with 0 neighbour' do
+          expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_alive)
+        # ! in ruby changes the object permanently
+          game_of_life.next_generation!
+          expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_dead)
+      end
+
+      it 'Kills live cell with 1 live neighbour' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1]])
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[0][1]).to eq(be_dead)
+        expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_dead)
+      end
+
+      it 'Dont kill live cell with 2 neighbours' do
+        game_of_life = Game_of_life.new(game_world, [[0, 1], [1, 1], [2, 1]])
+        game_of_life.next_generation!
+        expect(game_of_life.game_world.cells_grid[1][1]).to eq(be_alive)
+      end
+    end
+
+
+  end
 
 
 end

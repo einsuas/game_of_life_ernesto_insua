@@ -1,7 +1,8 @@
 class Cell
   attr_accessor :x, :y, :alive
 
-  def initialize(x=0, y=0)
+  def initialize(x = 0, y = 0)
+    #coordinates
     @x = x
     @y = y
     @alive = false
